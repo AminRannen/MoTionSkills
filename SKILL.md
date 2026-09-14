@@ -1,49 +1,53 @@
 ---
 name: motion-pharo-ast-patterns
-description: Create MoTion patterns in Pharo to match FAST models. Use when a user asks to write or adapt MoTion patterns for TypeScript AST, Java AST or XML AST. Route TypeScript work to MoTion.md + FASTTypeScript-MoTion.md, and XML work to MoTion.md + FASTXML-MoTion.md, and Java work to MoTion.md + FASTJava-MoTion.md.
+description: Create MoTion patterns and source transformations in Pharo for FAST TypeScript, Java, and XML models. Use when a user asks to find, analyze, rename, replace, or remove AST elements with MoTion.
 ---
 
-# MoTion Pharo AST Patterns
+# MoTion Pharo AST Patterns and Transformations
+
+Create valid, minimal Pharo code using MoTion and the relevant FAST metamodel.
 
 ## Workflow
 
-1. Identify the target AST domain from the user request.
-2. Load base MoTion guidance from `references/MoTion.md`.
+1. Identify the target AST domain: TypeScript, Java, or XML.
+2. Load `references/MoTion.md`.
 3. Load exactly one domain guide:
-- TypeScript AST: `references/FASTTypeScript-MoTion.md`
-- XML AST: `references/FASTXML-MoTion.md`
-- Java AST: `references/FASTJava-MoTion.md`
-4. If the user does not know where to find or install the repositories needed for MoTion or the FAST libraries, direct them to the Repositories.md file, which explains how to obtain and install the correct repositories.
-5. Build or revise the pattern in Pharo syntax.
-6. Return the pattern and a short explanation of key selectors/operators used.
+   - TypeScript: `references/FASTTypeScript-MoTion.md`
+   - Java: `references/FASTJava-MoTion.md`
+   - XML: `references/FASTXML-MoTion.md`
+4. If required dependencies are unavailable, consult `references/Repositories.md`.
+5. Build or revise the pattern in valid Pharo syntax.
+6. For source transformations:
+   - Use `MoTionRule`.
+   - Use `executeWithBindings` for replacements or renames.
+   - Use `executeRemoval` for removals.
+   - Bind AST nodes directly when possible so `startPos` and `endPos` identify the correct source range.
+7. Return the code, assumptions, and a short explanation of the relevant selectors and bindings.
 
 ## Domain Routing
 
-Use this routing consistently:
+- TypeScript, JavaScript, TS, or FAST TypeScript nodes: use `MoTion.md` and `FASTTypeScript-MoTion.md`.
+- Java or FAST Java nodes: use `MoTion.md` and `FASTJava-MoTion.md`.
+- XML, tags, attributes, or FAST XML nodes: use `MoTion.md` and `FASTXML-MoTion.md`.
 
-- If the request mentions TypeScript, JavaScript/TS source code, or FAST TypeScript nodes, use:
-`references/MoTion.md` and `references/FASTTypeScript-MoTion.md`.
-
-- If the request mentions XML, tags/attributes, or FAST XML nodes, use:
-`references/MoTion.md` and `references/FASTXML-MoTion.md`.
-
-- If the request mentions Java, tags/attributes, or FAST Java nodes, use:
-`references/MoTion.md` and `references/FASTJava-MoTion.md`.
-
-If the request is ambiguous, ask whether the target is TypeScript AST, Java AST or XML AST before writing the final pattern.
+If the target domain is ambiguous, ask the user to choose before writing a pattern.
 
 ## Output Rules
 
-1. Return valid Pharo/MoTion pattern code.
-2. Keep the pattern minimal and composable.
-3. Include assumptions when node types are inferred.
-4. When asked to improve an existing pattern, preserve user intent and explain the delta briefly.
+1. Return valid Pharo/MoTion code.
+2. Keep patterns minimal and composable.
+3. Use direct AST-node bindings for transformations whenever possible.
+4. Preserve the user’s intent when revising existing patterns.
+5. For removals, account for comma-separated syntax when applicable.
+6. When asked to test an existing implementation, do not modify it unless the user explicitly requests a fix.
+7. If a test fails, explain the cause and evidence before proposing changes.
 
 ## References
 
-Always treat these files as source of truth:
+Treat these as source of truth:
+
 - `references/MoTion.md`
 - `references/FASTTypeScript-MoTion.md`
-- `references/FASTXML-MoTion.md`
 - `references/FASTJava-MoTion.md`
-- `references/Repositories.md` (for locating required repositories)
+- `references/FASTXML-MoTion.md`
+- `references/Repositories.md`
