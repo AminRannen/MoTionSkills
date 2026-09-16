@@ -261,7 +261,7 @@ pattern match: anXMLNodeList.
 
 ## Finally
 
-or source code transformations using MoTion, see the dedicated MoTion-Transformation.md reference file.
+for source code transformations using MoTion, see the dedicated MoTion-Transformation.md reference file.
 
 Don't hesitate to ask. More examples can be found in tests package.
 Also if you are not familiar with MoTion, using it for the first time, no worries; here are some pages with examples: https://github.com/alesshosry/MoTionPatternsBookForAI. You can check them OR provide the files to AI agents so they can create the patterns for you ;)
