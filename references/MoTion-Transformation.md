@@ -39,6 +39,146 @@ rule := MoTionRule new
 
 updatedSource := rule executeWithBindings.
 ```
+## Examples
+
+The following examples illustrate the main transformation patterns supported by `MoTionRule`.
+
+### 1. Capture an AST node with `as:`
+
+Use `as:` when the transformation needs the actual matched AST node.
+
+```Smalltalk
+methodPattern := FASTTypeScriptMethodDefinition % {
+    #name <=> (FASTTypeScriptPropertyIdentifier % {
+        #sourceCode <=> 'multiply'
+    })
+} as: #methodNode.
+```
+
+The `#methodNode` binding contains the matched AST node. Since the node responds to `startPos` and `endPos`, `MoTionRule` can use its source range directly.
+
+### 2. Capture values with `@`
+
+Use `@` when the pattern needs to capture a value from the matched model.
+
+For example, parameters can be captured individually:
+
+```Smalltalk
+parametersPattern := FASTTypeScriptFormalParameters % {
+    #parameters <=> {
+        #'@p1' .
+        #'@p2'
+    }
+}.
+```
+
+The captured values can then be used as transformation bindings:
+
+```Smalltalk
+bindings: {
+    #p1 -> 'a: string'.
+    #p2 -> 'b: string'
+} asDictionary.
+```
+
+The transformation is then applied with:
+
+```Smalltalk
+updatedSource := rule executeWithBindings.
+```
+
+If a value binding does not directly contain an AST node, `MoTionRule` resolves it to the corresponding source node using `findNodeWithSourceCode:inModel:`.
+
+### 3. Capture a collection with `*rest`
+
+Use `*rest` when the remaining elements of a list need to be captured as a collection.
+
+```Smalltalk
+parametersPattern := FASTTypeScriptFormalParameters % {
+    #parameters <=> {
+        #'@p1' .
+        #'@p2' .
+        #'*rest'
+    }
+}.
+```
+
+The `#rest` binding contains the remaining matched elements.
+
+`MoTionRule` handles each element of the collection individually, resolving it to an AST node when necessary. This allows one transformation binding to operate on multiple source elements.
+
+### 4. Remove a complete AST node
+
+Use `as:` to capture the AST node and then pass the binding to `removalBindings`.
+
+```Smalltalk
+pattern := FASTTypeScriptClassDeclaration % {
+    (#'children*' <=> (FASTTypeScriptMethodDefinition % {
+        #name <=> (FASTTypeScriptPropertyIdentifier % {
+            #sourceCode <=> 'multiply'
+        })
+    } as: #methodToDelete))
+}.
+
+rule := MoTionRule new
+    sourcePattern: pattern;
+    model: model;
+    source: sourceCode;
+    removalBindings: #(#methodToDelete).
+
+updatedSource := rule executeRemoval.
+```
+
+The `#methodToDelete` binding contains the actual method AST node, allowing `executeRemoval` to remove its corresponding source range.
+
+### 5. Remove an element from a list
+
+For elements inside a list, bind the individual elements and specify the element to remove in `removalBindings`.
+
+```Smalltalk
+pattern := FASTTypeScriptMethodDefinition % {
+    #parameters <=> (FASTTypeScriptFormalParameters % {
+        #parameters <=> {
+            #'@p1' .
+            #'@p2' .
+            #'@p3'
+        }
+    })
+}.
+
+rule := MoTionRule new
+    sourcePattern: pattern;
+    model: method;
+    source: sourceCode;
+    removalBindings: #(#p3).
+
+updatedSource := rule executeRemoval.
+```
+
+`executeRemoval` handles the corresponding source range and also takes the surrounding comma into account when removing an element from a comma-separated list.
+
+### 6. Apply multiple transformations in one rule
+
+Several bindings can be transformed by the same `MoTionRule`.
+
+For example, a single rule can rename a class, a method, and several parameters:
+
+```Smalltalk
+bindings: {
+    #className -> 'CalculatorNew'.
+    #methodName -> 'computeNew'.
+    #p1 -> 'xNew: number'.
+    #p2 -> 'yNew: number'
+} asDictionary.
+```
+
+Then:
+
+```Smalltalk
+updatedSource := rule executeWithBindings.
+```
+
+Multiple changes are collected and applied from right to left so that modifying a later source range does not invalidate the positions of earlier ranges.
 
 ## Replacement transformations
 
