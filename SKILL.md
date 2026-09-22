@@ -4,8 +4,7 @@ description: Create MoTion patterns in Pharo to match FAST models. Use when a us
 ---
 ---
 
-name: motion-pharo-ast-patterns
-description: Create MoTion patterns in Pharo to match FAST models. Use when a user asks to write or adapt MoTion patterns for TypeScript AST, Java AST or XML AST. Route TypeScript work to MoTion.md + FASTTypeScript-MoTion.md, XML work to MoTion.md + FASTXML-MoTion.md, and Java work to MoTion.md + FASTJava-MoTion.md. For source code transformations, also use MoTion-Transformation.md.
+
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # MoTion Pharo AST Patterns
